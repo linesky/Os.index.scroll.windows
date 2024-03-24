@@ -1,28 +1,38 @@
 format mz
+           
+                          
 start:
-		
+JMP MAIN                
+sourcetext dd 1
+destenytext dd 1
+x:    dd 0     
+y:     dd 0
+color dd 07h
+MAIN:   		
           call clears
           
-          mov si,text1                
+                           
+          mov si,text1
+          inc si
           mov ax,cs
           call mem32
-
                           
           mov esi,eax
-          mov ecx,1
-          mov edx,2
+          mov ecx,16
+          mov ax,1                
                           
                           
-          FOR1:                
-                    mov ax,cx
-                    mov bx,cx
-                    call gotoxy
-                    mov edi,eax
-                    call copymem32
-                                    
-                    inc cx                
-                    cmp ecx,16
-                    JB FOR1                   
+          FOR1:     cs           
+                    mov [x],al                
+                    cs
+                    mov [y],al                
+                    call print32
+                    inc ax                
+                    cmp ax,22
+                    JB FOR1    
+                    
+                    
+         call scrollup               
                           
           exitdo:                
                                     
@@ -219,10 +229,94 @@ clears:
           pop ax                
           RET        
 
+print32:                
+          push eax                
+          push ebx                
+          push ecx                
+          push edx                
+          push esi                
+          push edi                
+          push ebp                
+          cmp ecx,0
+          JZ PRINT3213
+          cs
+          mov al,[x]                
+          cs
+          mov bl,[y]               
+          and ax,0ffh
+          and bx,0ffh
+          call gotoxy
+          mov edi,eax
+          cmp ecx,255
+          JB PRINT3212
+          mov ebx,255
+          PRINT3212:
+          mov edx,2
+          call copymem32 
+          cs
+          mov al,[x]                
+          cs
+          mov bl,[y]                
+          and ax,0ffh
+          and bx,0ffh
+          mov si,bx
+          clc                
+          add ax,cx
+          cmp ax,80
+          JB PRINT328
+          mov bx,80
+          sub ax,bx
+          xor dx,dx
+          xor cx,cx
+          mov bx,80
+          clc                
+          div bx                
+          clc                
+          add ax,si
+          cmp ax,24
+          JB PRINT328
+          mov ax,24
+          PRINT328:
+          cs
+          mov [y],ax                
+          cs
+          mov [x],dx 
+          PRINT3213:
+          pop ebp                
+          pop edi                
+          pop esi                
+          pop edx                
+          pop ecx                 
+          pop ebx                
+          pop eax                
+          RET                
+               
+scrollup:
+          push eax                
+          push ebx                
+          push ecx                
+          push edx                
+          push esi                
+          push edi                
+          push ebp                
+          push ds                
+          mov ax,0                
+          mov ds,ax
+          mov edi,0b8000h
+          mov esi,0b8000h+160  
+          mov ecx,80*24*2
+          mov edx,1
+          call copymem32
+          pop ds                
+          pop ebp                
+          pop edi                
+          pop esi                
+          pop edx                
+          pop ecx                 
+          pop ebx                
+          pop eax                
+          RET          
 
-x     db 0     
-y     db 0
-color dw 07h
-text1 db "hello world.....",13,10,0
+text1 db 18,"hello world.....",13,10,0
 string2 db "$",0
 
