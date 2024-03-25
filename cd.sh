@@ -12,6 +12,7 @@ cp *.jpg CD_root/isolinux/
 cp *.menu CD_root/isolinux/
 cp *.txt CD_root/isolinux/
 fasm cmd.asm hello.com
+fasm type.asm type.exe
 fasm beep.asm beep.exe
 fasm help.asm help.exe
 fasm dir.asm dir.exe
