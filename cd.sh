@@ -22,6 +22,7 @@ fasm time.asm time.exe
 fasm date.asm date.exe
 fasm clock.asm clock.exe
 fasm shutdown.asm shutdown.exe
+fasm line.asm line.exe
 cp *.com CD_root/isolinux/
 cp *.exe CD_root/isolinux/
 ls *.exe CD_root/isolinux/ > list.txt

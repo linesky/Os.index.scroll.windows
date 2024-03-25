@@ -1,87 +1,34 @@
-org 0x100
-           
-                          
+format mz                
 start:
-jmp MAIN                
+JMP MAIN                
 sourcetext dd 1
 destenytext dd 1
 x:    dd 0     
 y:     dd 0
 color dd 07h
-MAIN:
-mov sp,0ffffh
-mov ax,cs
-mov ss,ax
-mov ax,cs
-mov es,ax
+MAIN:   		
+          call backs
+          
+push ds
 mov ds,ax
-call backs
-
-          mov si,endf
-          mov ax,cs
-          call mem32
-          mov edi,eax
-          mov edx,1
-          mov al,0
-          mov ecx,86
-          call fill32
-          
-   		
-          
-         mov bx,text1
-         mov cx,6
-         call cprint                 
-mov bx,endf
-mov cx,79
-call getstr
-         mov bx,endf
-         call len
-         mov cx,2
-         mov bx,str2
-         
-         call cprint 
-         mov bx,endf
-         mov dx,spc
-         mov cx,1
-         call findstring
-         
-         mov dx,endf
-         cmp ax,0ffffh
-         jz escpp
-
-         mov bx,exch
-         inc ax
-         cs
-         mov [bx],ax
-         
-         mov bx,ax
-         dec bx
-         mov al,0
-         cs
-         mov [bx],al
-         
-         jmp escpp2
-         escpp:
-         mov bx,exch
-         cs
-         mov [bx],dx
-         escpp2:
-                    
-call backs
-
-
-
-                   
+call len
+mov cx,ax
+call cprint                  
+pop ds                    
                      
-                          
+call backs                          
           exitdo:                
                                     
-                    ;int 20h               
-                    exit:                
-                              jmp loads            
+                                    
+                    exit:     
+                              retf          
+                              int 20h                
+                              xor ah,ah
+                              int 21h                
                                              
                 
-
+halt:
+jmp halt
 fill32:                
           push eax                
           push ebx                
@@ -397,9 +344,7 @@ getstr:
                     dec cx                
                     cmp cx,0                
                     JA GETSTR1 
-          GETSTR3:
-          mov al,0
-          mov [bx],al                
+          GETSTR3:                
           pop dx                
           pop cx                
           pop bx                
@@ -453,7 +398,8 @@ backs:
           pop cx                
           pop bx                
           pop ax                
-          RET 
+          RET   
+          
 len:                
           push bx                
           push cx                
@@ -472,282 +418,10 @@ len:
           pop dx                
           pop cx                
           pop bx                
-          RET 
-loads:
-
-;calculator of next 64 segment
-	mov ax,cs
-	mov bx,0x1000
-	clc
-	add ax,bx
-	push ax
-	mov ds,ax
-	mov bx,0
-	mov al,0
-	mov cx,1024
-	fori:
-	    
-	    ds
-	    mov [bx],al
-	    inc bx
-	    dec cx
-	    cmp cx,0
-	    jnz fori
-;----------------------------------	
-;open file
-        mov ax,cs
-        mov es,ax
-        mov es,ax
-	mov ax,6
-	mov si,endf
-	int 0x22
-	mov ecx,eax
-;----------------------------------
-reads:
-
-;read file	
-        mov ax,7
-        mov bx,0
-        pop es
-        push es
-	int 0x22
-;----------------------------------
-;close file
-	mov ax,8
-	int 0x22
-pop es
-mov ax,es
-mov ds,ax
-;----------------------------------
-mov ax,ds
-mov bx,0x0
-ds
-mov al,[bx]
-cmp al,'M'
-jnz printe
-;----------------------------------
-;cs load
-mov ax,ds
-mov bx,0x8
-ds
-mov cx,[bx]
-add ax,cx
-mov bx,0x16
-ds
-mov cx,[bx]
-add ax,cx
-mov si,ax
-;----------------------------------
-;ip load
-mov bx,0x14
-ds
-mov cx,[bx]
-mov di,cx
-;----------------------------------
-;ss load
-mov ax,ds
-mov sp,0xFFFF
-mov bx,0x0e
-ds
-mov cx,[bx]
-add ax,cx
-mov ss,ax
-;----------------------------------
-;sp load
-mov bx,0x10
-ds
-mov cx,[bx]
-mov sp,cx
-;----------------------------------
-mov ax,cs
-push ax
-mov ax,MAIN
-push ax
-push si
-push di
-mov ax,si
-mov es,ax
-mov ds,ax
-mov si,0
-mov bx,exch
-cs
-mov ax,[bx]
-mov bx,ax
-mov dx,0
-mov cx,32000
-mov ax,cs
-retf
-printe:
-mov ax,cs
-mov ds,ax
-mov es,ax
-pop ax
-
-         mov bx,errors
-         call len
-         mov cx,ax
-         mov bx,errors
-         
-         call cprint 
-mov ax,cs
-mov ds,ax
-mov es,ax
-jmp MAIN 
-compstr:                
-          push bx                
-          push cx                
-          push dx                
-          push di                
-          push si                
-          mov cx,0                
-          mov si,bx
-          mov di,dx
-          COMPSTR1:
-                    mov al,[si]
-                    mov ah,[di]
-                    cmp al,0                
-                    JZ COMPSTR2
-                    cmp ah,0                
-                    JZ COMPSTR2
-                    cmp al,ah
-                    JNZ COMPSTR2
-                    inc di                
-                    inc si                
-                    inc cx                
-                    cmp cx,0                
-                    JNZ COMPSTR1
-          COMPSTR2:
-          mov ax,cx
-          pop si                
-          pop di                
-          pop dx                
-          pop cx                
-          pop bx                
           RET                
-                
-findstring:
-          push bx                
-          push cx                
-          push dx                
-          push di                
-          push si                
-          mov si,dx
-          xor ax,ax
-          mov al,[si]
-          mov di,ax
-          mov si,bx
-          mov bx,dx
-          call len 
-          cmp ax,0                
-          JNZ FINDSTRING9
-          mov ax,0ffffh
-          jmp  FINDSTRING8
-          FINDSTRING9:
-          mov bx,si
-          mov si,ax
-          FINDSTRING1:
-                    mov ax,di
-                    call findchar
-                    cmp ax,0ffffh
-                    JZ FINDSTRING8
-                    clc                 
-                    add bx,ax
-                    call compstr
-                    cmp si,ax
-                    JZ FINDSTRING10
-                    inc bx                
-                    jmp FINDSTRING1
-                    FINDSTRING10:
-                    mov ax,bx
-                    FINDSTRING8:
-                    pop si                
-                    pop di                
-                    pop dx                
-                    pop cx                
-                    pop bx                
-                                    
-                    RET
-        
-          RET                                        
-findchar:
-          push bx                
-          push cx                
-          push dx                
-          mov cx,0                
-          mov ah,al
-          FINDCHAR1:
-                    mov al,[bx]
-                    cmp al,0                
-                    JZ FINDCHAR2
-                    cmp al,ah
-                    JZ FINDCHAR3
-                    inc bx                
-                    inc cx                
-                    cmp cx,255
-                    JNZ FINDCHAR1
-          FINDCHAR2:
-          mov cx,0ffffh
-          FINDCHAR3:
-          mov ax,cx
-          pop dx                
-          pop cx                
-          pop bx                
-          RET      
-                                             
-compstring:
-          push bx                
-          push cx                
-          push dx                
-          push di                
-          push si                
-          mov cx,0                
-          mov si,bx
-          mov di,dx
-          COMPSTRING1:
-                    mov al,[si]
-                    mov ah,[di]
-                    cmp al,0                
-                    JZ COMPSTRING2
-                    cmp ah,0                
-                    JZ COMPSTRING2
-                    cmp al,ah
-                    JNZ COMPSTRING2
-                    inc di                
-                    inc si                
-                    inc cx                
-                    cmp cx,0                
-                    JNZ COMPSTRING1
-          COMPSTRING2:
-          cmp al,ah
-          JZ COMPSTRING3
-          JB COMPSTRING4
-          mov ax,1                
-          jmp COMPSTRING5
-          COMPSTRING3:
-          mov ax,0                
-          jmp COMPSTRING5
-          COMPSTRING4:
-          mov ax,2                
-          COMPSTRING5:
-                    pop si                
-                    pop di                
-                    pop dx                
-                    pop cx                
-                    pop bx                
-                    RET    
-                    
-findpos:                
-          call findstring
-          cmp ax,0ffffh
-          JZ FINDPOS1
-          sub ax,bx
-          FINDPOS1:
-          RET             
-                 
-text1 db " cmd> ",0
+                              
+text1 db 22,"input a string.....",13,10,0
 string2 db "$",0
-errors db "file not found",13,10,0
-exch dd 0
-spc db " ",0
-str2 db 13,10,">"
-endf db "                                                                         "
+file1 db "list.txt"
+str2 db 13,10,"sys operater",13,10,"hello.exe",13,10,"dir.exe",13,10,"exit.exe",13,10,"clock.exe",13,10,"cls.exe",13,10,"date.exe",13,10,"time.exe",13,10,"hello.exe",13,10,"sleep.exe",13,10,0
+endf db "          .                                                               "
