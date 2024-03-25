@@ -1,4 +1,6 @@
-# Os.iso.linux.gotoxy32
-iso linux fasm print at screen pos 
+# Os.iso.linux.command.exe
+
+
+operation system than runs 16bits dos .exe
 
 
