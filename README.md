@@ -4,3 +4,4 @@
 operation system than runs 16bits dos .exe
 
 
+on command line run helq.exe
