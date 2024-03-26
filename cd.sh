@@ -14,6 +14,7 @@ cp *.txt CD_root/isolinux/
 fasm cmd.asm hello.com
 fasm type.asm type.exe
 fasm beep.asm beep.exe
+fasm sound.asm sound.exe
 fasm help.asm help.exe
 fasm dir.asm dir.exe
 fasm exit.asm exit.exe
